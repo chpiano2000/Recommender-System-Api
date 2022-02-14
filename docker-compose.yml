@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  backend:
+    build: .
+    networks:
+      - RS-network
+    ports:
+      - "8000:8000"
+
+networks:
+  RS-network:
+    driver: bridge
