@@ -31,12 +31,14 @@ def generate_token(username: Union[str, Any]) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=SECURITY_ALGORITHM)
     return encoded_jwt
 
-@app.post("/history/{user_id}", dependencies=[Depends(reusable_oauth2)])
+# @app.post("/history/{user_id}", dependencies=[Depends(reusable_oauth2)])
+@app.post("/history/{user_id}")
 def predict(user_id: int):
     _ , history = predict_model(user_id, load_model)
     return history
 
-@app.post("/recommender/{user_id}", dependencies=[Depends(reusable_oauth2)])
+# @app.post("/recommender/{user_id}", dependencies=[Depends(reusable_oauth2)])
+@app.post("/recommender/{user_id}")
 def recommend(user_id: int):
     recommended_movies, _ = predict_model(user_id, load_model)
     return recommended_movies
