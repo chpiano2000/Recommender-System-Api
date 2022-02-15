@@ -7,8 +7,20 @@ from datetime import datetime, timedelta
 from typing import Union, Any
 from pydantic import BaseModel
 from security import validate_token, reusable_oauth2
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 load_model = pickle.load(open('recommender.pkl', 'rb'))
 user_data = pd.read_csv("ml-latest-small/ratings.csv")["userId"].unique().tolist()
@@ -31,14 +43,14 @@ def generate_token(username: Union[str, Any]) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=SECURITY_ALGORITHM)
     return encoded_jwt
 
-# @app.post("/history/{user_id}", dependencies=[Depends(reusable_oauth2)])
-@app.post("/history/{user_id}")
+@app.post("/history/{user_id}", dependencies=[Depends(reusable_oauth2)])
+# @app.post("/history/{user_id}")
 def predict(user_id: int):
     _ , history = predict_model(user_id, load_model)
     return history
 
-# @app.post("/recommender/{user_id}", dependencies=[Depends(reusable_oauth2)])
-@app.post("/recommender/{user_id}")
+@app.post("/recommender/{user_id}", dependencies=[Depends(reusable_oauth2)])
+# @app.post("/recommender/{user_id}")
 def recommend(user_id: int):
     recommended_movies, _ = predict_model(user_id, load_model)
     return recommended_movies
